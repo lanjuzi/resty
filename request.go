@@ -54,6 +54,7 @@ type Request struct {
 	IsDebug                      bool
 	IsCloseConnection            bool
 	IsResponseDoNotParse         bool
+	IsResponseDoNotDecompress    func(*Response) bool
 	ResponseSaveFileName         string
 	ResponseExpectContentType    string
 	ResponseForceContentType     string
@@ -794,6 +795,12 @@ func (r *Request) SetCloseConnection(close bool) *Request {
 // takes over the control of handling response body from Resty.
 func (r *Request) SetResponseDoNotParse(notParse bool) *Request {
 	r.IsResponseDoNotParse = notParse
+	return r
+}
+
+// SetResponseDoNotCompress method instructs Resty not to decompress the response body automatically.
+func (r *Request) SetResponseDoNotCompress(isResponseDoNotDecompress func(*Response) bool) *Request {
+	r.IsResponseDoNotDecompress = isResponseDoNotDecompress
 	return r
 }
 

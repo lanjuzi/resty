@@ -310,6 +310,10 @@ func (r *Response) wrapCopyReadCloser() {
 }
 
 func (r *Response) wrapContentDecompresser() error {
+	if r.Request.IsResponseDoNotDecompress != nil && r.Request.IsResponseDoNotDecompress(r) {
+		return nil
+	}
+
 	ce := r.Header().Get(hdrContentEncodingKey)
 	if isStringEmpty(ce) {
 		return nil

@@ -885,6 +885,30 @@ func TestDeflateCompress(t *testing.T) {
 	}
 }
 
+func TestNoDecompress(t *testing.T) {
+	ts := createGenericServer(t)
+	defer ts.Close()
+
+	c := dcnl()
+	c.SetResponseDoNotCompress(func(response *Response) bool {
+		return true
+	})
+	testcases := []struct{ url, want string }{
+		{ts.URL + "/gzip-test", "gzip"},
+		{ts.URL + "/deflate-test", "deflate"},
+	}
+	for _, tc := range testcases {
+		resp, err := c.R().Get(tc.url)
+
+		assertError(t, err)
+		assertEqual(t, http.StatusOK, resp.StatusCode())
+		assertEqual(t, "200 OK", resp.Status())
+		assertEqual(t, tc.want, resp.Header().Get(hdrContentEncodingKey))
+
+		logResponse(t, resp)
+	}
+}
+
 type lzwReader struct {
 	s io.ReadCloser
 	r io.ReadCloser

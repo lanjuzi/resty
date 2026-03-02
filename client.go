@@ -199,6 +199,7 @@ type Client struct {
 	jsonEscapeHTML             bool
 	closeConnection            bool
 	isResponseDoNotParse       bool
+	isResponseDoNotDecompress  func(*Response) bool
 	isTrace                    bool
 	debugBodyLimit             int
 	responseSaveDirectory      string
@@ -694,6 +695,7 @@ func (c *Client) R() *Request {
 		IsDebug:                      c.debug,
 		IsTrace:                      c.isTrace,
 		IsResponseSaveToFile:         c.isResponseSaveToFile,
+		IsResponseDoNotDecompress:    c.isResponseDoNotDecompress,
 		AuthScheme:                   c.authScheme,
 		AuthToken:                    c.authToken,
 		RetryCount:                   c.retryCount,
@@ -1980,6 +1982,14 @@ func (c *Client) SetResponseDoNotParse(notParse bool) *Client {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	c.isResponseDoNotParse = notParse
+	return c
+}
+
+// SetResponseDoNotCompress method instructs Resty not to decompress the response body automatically.
+func (c *Client) SetResponseDoNotCompress(isResponseDoNotDecompress func(*Response) bool) *Client {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+	c.isResponseDoNotDecompress = isResponseDoNotDecompress
 	return c
 }
 
